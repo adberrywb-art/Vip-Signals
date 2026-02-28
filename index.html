@@ -506,7 +506,7 @@
     <!-- Terms Modal2 -->
      <div id="termsModal2" class="success-modal">
         <div class="success-content max-w-2xl max-h-[80vh] overflow-y-auto text-left">
-            <h2 class="text-2xl font-bold mb-4 gradient-text">Términos y Condiciones</h2>
+            <h2 class="text-2xl font-bold mb-4 gradient-text">Privacidad</h2>
             <div class="text-sm text-gray-300 space-y-4 max-h-96 overflow-y-auto pr-2">
                 <p>1. <strong>Servicios:</strong> Protegemos tus datos personales.</p>
                 <p>2. <strong>Pagos:</strong> No compartimos información con terceros.</p>
@@ -857,13 +857,13 @@ Create by Adberry
         function closeTermsModal() {
             document.getElementById('termsModal').style.display = 'none';
         }
-        
-        function closeTermsModal2() {
-            document.getElementById('termsModal2').style.display = 'none';
-        }
 
         function showPrivacy() {
             document.getElementById('termsModal2').style.display = 'flex';
+        }
+
+        function closeTermsModal2() {
+            document.getElementById('termsModal2').style.display = 'none';
         }
 
         // Verificar parámetros de URL (para retornos de pago)
@@ -890,7 +890,7 @@ Create by Adberry
             });
             // Cerrar modales al hacer clic fuera
         window.onclick = function(event) {
-            const modals = ['successModal', 'termsModal2'];
+            const modals = ['successModal2', 'termsModal2'];
             modals.forEach(id => {
                 const modal = document.getElementById(id);
                 if (event.target === modal) {
