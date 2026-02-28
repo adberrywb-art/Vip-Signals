@@ -204,7 +204,7 @@
                         <div class="pulse-ring absolute inset-0 w-12 h-12"></div>
                     </div>
                     <div>
-                        <h1 class="text-2xl font-bold gradient-text">TRADING PRO</h1>
+                        <h1 class="text-2xl font-bold gradient-text">VIP SIGNALS</h1>
                         <p class="text-xs text-gray-400">By Adberry</p>
                     </div>
                 </div>
@@ -270,7 +270,7 @@
                 <div class="text-gray-400">Miembros Activos</div>
             </div>
             <div class="glass-effect rounded-2xl p-6 text-center">
-                <div class="text-4xl font-bold gradient-text mb-2">89%</div>
+                <div class="text-4xl font-bold gradient-text mb-2">85%</div>
                 <div class="text-gray-400">Precisión Señales</div>
             </div>
             <div class="glass-effect rounded-2xl p-6 text-center">
@@ -331,7 +331,7 @@
                             <p class="text-sm text-gray-400">Pago seguro con tarjeta</p>
                         </div>
                     </div>
-                    <div class="text-3xl font-bold mb-4">$99<span class="text-lg text-gray-400">/mes</span></div>
+                    <div class="text-3xl font-bold mb-4">$30<span class="text-lg text-gray-400">/mes</span></div>
                     <button onclick="openStripePayment()" class="w-full glow-button bg-gradient-to-r from-purple-500 to-purple-700 py-3 rounded-xl font-semibold hover:shadow-lg transition-all">
                         Pagar con Stripe
                     </button>
@@ -347,7 +347,7 @@
                             <p class="text-sm text-gray-400">Pago rápido y seguro</p>
                         </div>
                     </div>
-                    <div class="text-3xl font-bold mb-4">$99<span class="text-lg text-gray-400">/mes</span></div>
+                    <div class="text-3xl font-bold mb-4">$30<span class="text-lg text-gray-400">/mes</span></div>
                     <button onclick="openPayPalPayment()" class="w-full glow-button bg-gradient-to-r from-blue-500 to-blue-700 py-3 rounded-xl font-semibold hover:shadow-lg transition-all">
                         Pagar con PayPal
                     </button>
@@ -363,7 +363,7 @@
                             <p class="text-sm text-gray-400">Pago con cripto</p>
                         </div>
                     </div>
-                    <div class="text-3xl font-bold mb-4">$99<span class="text-lg text-gray-400">/mes</span></div>
+                    <div class="text-3xl font-bold mb-4">$30<span class="text-lg text-gray-400">/mes</span></div>
                     <div class="bg-black/30 rounded-lg p-3 mb-4 text-center">
                         <p class="text-xs text-gray-400">ID de Binance:</p>
                         <p class="font-mono text-yellow-400 font-bold select-all" id="binanceId">123456789</p>
@@ -385,7 +385,7 @@
                                 <p class="text-sm text-gray-400">Transferencia bancaria directa</p>
                             </div>
                         </div>
-                        <div class="text-3xl font-bold mb-4 md:mb-0">$99<span class="text-lg text-gray-400">/mes</span></div>
+                        <div class="text-3xl font-bold mb-4 md:mb-0">$30<span class="text-lg text-gray-400">/mes</span></div>
                         <button onclick="showTransferDetails()" class="glow-button bg-gradient-to-r from-green-500 to-green-700 px-8 py-3 rounded-xl font-semibold hover:shadow-lg transition-all">
                             Ver Datos Bancarios
                         </button>
@@ -488,8 +488,11 @@
     </div>
 
     <!-- Terms Modal -->
-    <div id="termsModal" class="success-modal">
-        <div class="success-content max-w-2xl max-h-[80vh] overflow-y-auto text-left">
+    <div id="successModal" class="success-modal">
+        <div class="success-content">
+            <div class="w-20 h-20 bg-gradient-to-br from-cyan-400 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-check text-4xl text-white"></i>
+            </div>
             <h2 class="text-2xl font-bold mb-4 gradient-text">Términos y Condiciones</h2>
             <div class="text-sm text-gray-300 space-y-4 max-h-96 overflow-y-auto pr-2">
                 <p>1. <strong>Servicios:</strong> Trading Pro proporciona señales de trading, educación y análisis de mercado.</p>
@@ -535,8 +538,8 @@
             // Datos bancarios para SPEI
             bank: {
                 name: 'BBVA',
-                holder: 'TU NOMBRE COMPLETO',
-                clabe: '012345678901234567',
+                holder: 'Nomnre',
+                clabe: '638180000185796974',
                 account: '1234567890'
             }
         };
@@ -639,7 +642,7 @@
                 merchantId: CONFIG.binance.merchantId,
                 merchantTradeNo: 'TRADE_' + Date.now(),
                 tradeType: 'WEB',
-                totalFee: 99.00,
+                totalFee: 30.00,
                 currency: 'USDT',
                 productType: 'Trading Subscription',
                 productName: 'Trading Pro Premium',
@@ -693,7 +696,7 @@
             const receiptData = {
                 orderId: 'TRX-' + Date.now(),
                 date: new Date().toLocaleString(),
-                amount: '$99.00 USD',
+                amount: '$30.00 USD',
                 description: 'Trading Pro Premium - 1 Mes',
                 status: 'Pagado',
                 paymentMethod: 'Múltiple'
