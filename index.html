@@ -505,6 +505,10 @@
     </div>
 
     <script>
+         // Forzar HTTPS
+         if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
+            window.location.href = 'https://' + window.location.host + window.location.pathname;
+            }
         // Configuración - REEMPLAZA ESTOS DATOS CON TUS CREDENCIALES REALES
         const CONFIG = {
             // Stripe Configuration
