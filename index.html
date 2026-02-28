@@ -654,20 +654,23 @@
         </div>
     </section>
 
-    <!-- Footer -->
+        <!-- Footer -->
     <footer class="border-t border-white/10 py-8 sm:py-12 px-4 mt-12 sm:mt-20">
         <div class="max-w-7xl mx-auto">
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 mb-6 sm:mb-8 text-center sm:text-left">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 mb-6 sm:mb-8 text-center">
+                <!-- Columna 1: Logo -->
                 <div>
-                    <div class="flex items-center justify-center sm:justify-start space-x-2 mb-3 sm:mb-4">
+                    <div class="flex items-center justify-center space-x-2 mb-3 sm:mb-4">
                         <div class="w-8 h-8 bg-gradient-to-br from-cyan-400 to-purple-600 rounded-lg flex items-center justify-center">
                             <i class="fas fa-chart-line text-white text-sm"></i>
                         </div>
                         <span class="text-lg sm:text-xl font-bold gradient-text">TRADING PRO</span>
                     </div>
-                    <p class="text-gray-400 text-xs sm:text-sm">Educación y señales de trading profesional para traders ambiciosos.</p>
+                    <p class="text-gray-400 text-xs sm:text-sm px-4 sm:px-0">Educación y señales de trading profesional para traders ambiciosos.</p>
                 </div>
-                <div>
+                
+                <!-- Columna 2: Enlaces -->
+                <div class="text-center">
                     <h4 class="font-semibold mb-3 sm:mb-4 text-sm sm:text-base">Enlaces</h4>
                     <ul class="space-y-2 text-xs sm:text-sm text-gray-400">
                         <li><a href="#inicio" class="hover:text-cyan-400 transition-colors">Inicio</a></li>
@@ -675,18 +678,27 @@
                         <li><a href="#pagos" class="hover:text-cyan-400 transition-colors">Métodos de Pago</a></li>
                     </ul>
                 </div>
-                <div>
+                
+                <!-- Columna 3: Legal - CORREGIDO CENTRADO -->
+                <div class="text-center">
                     <h4 class="font-semibold mb-3 sm:mb-4 text-sm sm:text-base">Legal</h4>
                     <ul class="space-y-2 text-xs sm:text-sm text-gray-400">
-                        <li><button onclick="showTerms()" class="hover:text-cyan-400 transition-colors text-left w-full">Términos y Condiciones</button></li>
-                        <li><button onclick="showPrivacy()" class="hover:text-cyan-400 transition-colors text-left w-full">Política de Privacidad</button></li>
-                        <li><a href="#" class="hover:text-cyan-400 transition-colors">Contacto</a></li>
+                        <li class="text-center">
+                            <button onclick="showTerms()" class="hover:text-cyan-400 transition-colors text-center w-full">Términos y Condiciones</button>
+                        </li>
+                        <li class="text-center">
+                            <button onclick="showPrivacy()" class="hover:text-cyan-400 transition-colors text-center w-full">Política de Privacidad</button>
+                        </li>
+                        <li class="text-center">
+                            <a href="#" class="hover:text-cyan-400 transition-colors">Contacto</a>
+                        </li>
                     </ul>
                 </div>
             </div>
-            <div class="border-t border-white/10 pt-6 sm:pt-8 flex flex-col sm:flex-row justify-between items-center gap-2">
-                <p class="text-gray-500 text-xs sm:text-sm">&copy; 2024 Trading Pro. Create by Adberry</p>
-                <p class="text-gray-600 text-xs">Todos los derechos reservados</p>
+            
+            <div class="border-t border-white/10 pt-6 sm:pt-8 flex flex-col sm:flex-row justify-between items-center gap-2 text-center">
+                <p class="text-gray-500 text-xs sm:text-sm w-full sm:w-auto">&copy; 2024 Trading Pro. Create by Adberry</p>
+                <p class="text-gray-600 text-xs w-full sm:w-auto">Todos los derechos reservados</p>
             </div>
         </div>
     </footer>
