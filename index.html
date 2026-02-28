@@ -503,6 +503,22 @@
             </button>
         </div>
       </div>
+    <!-- Terms Modal2 -->
+     <div id="termsModal2" class="success-modal">
+        <div class="success-content max-w-2xl max-h-[80vh] overflow-y-auto text-left">
+            <h2 class="text-2xl font-bold mb-4 gradient-text">Términos y Condiciones</h2>
+            <div class="text-sm text-gray-300 space-y-4 max-h-96 overflow-y-auto pr-2">
+                <p>1. <strong>Servicios:</strong> Protegemos tus datos personales.</p>
+                <p>2. <strong>Pagos:</strong> No compartimos información con terceros.</p>
+                <p>3. <strong>Reembolsos:</strong> Usamos encriptación SSL.</p>
+                <p>4. <strong>Riesgos:</strong> Cumplimos con GDPR y leyes locales.</p>
+            </div>
+            <button onclick="closeTermsModal2()" class="mt-6 glow-button bg-gradient-to-r from-cyan-500 to-purple-600 px-8 py-3 rounded-full font-semibold w-full">
+                Cerrar
+            </button>
+        </div>
+     </div>
+    
 
     <script>
          // Forzar HTTPS
@@ -841,9 +857,13 @@ Create by Adberry
         function closeTermsModal() {
             document.getElementById('termsModal').style.display = 'none';
         }
+        
+        function closeTermsModal2() {
+            document.getElementById('termsModal2').style.display = 'none';
+        }
 
         function showPrivacy() {
-            alert('Política de Privacidad:\n\n1. Protegemos tus datos personales.\n2. No compartimos información con terceros.\n3. Usamos encriptación SSL.\n4. Cumplimos con GDPR y leyes locales.');
+            document.getElementById('termsModal2').style.display = 'flex';
         }
 
         // Verificar parámetros de URL (para retornos de pago)
@@ -862,6 +882,15 @@ Create by Adberry
         // Cerrar modales al hacer clic fuera
         window.onclick = function(event) {
             const modals = ['successModal', 'termsModal'];
+            modals.forEach(id => {
+                const modal = document.getElementById(id);
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+            // Cerrar modales al hacer clic fuera
+        window.onclick = function(event) {
+            const modals = ['successModal', 'termsModal2'];
             modals.forEach(id => {
                 const modal = document.getElementById(id);
                 if (event.target === modal) {
