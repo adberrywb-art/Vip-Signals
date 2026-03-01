@@ -19,7 +19,7 @@ post '/create-checkout-session' do
       quantity: 1,
     }],
     mode: 'payment',
-    success_url: YOUR_DOMAIN + '/success.html',
+    success_url: https://www.tradingprovipsignals.online/ + '/success.html',
     automatic_tax: {enabled: true},
   })
   redirect session.url, 303
