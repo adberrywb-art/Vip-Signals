@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vip Signals - Adberry</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        html {
+            font-size: 14px;
+        }
+        
+        @media (min-width: 640px) {
+            html {
+                font-size: 16px;
+            }
+        }
+        
+        body {
+            background: #0a0e1a;
+            color: #ffffff;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .nav-glass {
+            background: rgba(10, 14, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .glow-button {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .glow-button:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .glow-button:hover:before {
+            left: 100%;
+        }
+        
+        .payment-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .payment-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0, 212, 255, 0.5);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.1);
+        }
+        
+        .floating-emoji {
+            position: fixed;
+            pointer-events: none;
+            animation: floatUp 3s ease-out forwards;
+            font-size: 20px;
+            z-index: 9999;
+        }
+        
+        @keyframes floatUp {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(0.5) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-300px) scale(1.2) rotate(360deg);
+            }
+        }
+        
+        .success-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(5px);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .success-modal.active {
+            opacity: 1;
+        }
+        
+        .success-content {
+            background: linear-gradient(145deg, #1a1f2e 0%, #0f1419 100%);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 20px;
+            padding: 1.5rem;
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        
+        .success-modal.active .success-content {
+            transform: scale(1);
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        .chart-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.05;
+            z-index: -1;
+            background-image: 
+                linear-gradient(rgba(0, 212, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+        
+        .pulse-ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid rgba(0, 212, 255, 0.5);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+        }
+        
+        .trading-ticker {
+            background: rgba(0,0,0,0.3);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        
+        .ticker-wrapper {
+            display: inline-block;
+            animation: ticker 30s linear infinite;
+        }
+        
+        @keyframes ticker {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+        
+        .hidden-section {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        .visible-section {
+            display: block;
+            opacity: 1;
+        }
+        
+        /* Mejoras responsive */
+        .responsive-text {
+            font-size: clamp(1.5rem, 5vw, 3.5rem);
+            line-height: 1.2;
+        }
+        
+        .responsive-padding {
+            padding: clamp(1rem, 4vw, 3rem);
+        }
+        
+        /* Modal de términos mejorado */
+        .terms-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            z-index: 10001;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .terms-modal.active {
+            opacity: 1;
+        }
+        
+        .terms-content {
+            background: linear-gradient(145deg, #1a1f2e 0%, #0f1419 100%);
+            border: 2px solid rgba(0, 212, 255, 0.4);
+            border-radius: 24px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        
+        .terms-modal.active .terms-content {
+            transform: scale(1);
+        }
+        
+        .terms-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .terms-title {
+            font-size: 1.75rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        
+        .terms-body {
+            color: #e5e7eb;
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+        
+        .terms-body p {
+            margin-bottom: 1rem;
+        }
+        
+        .terms-body strong {
+            color: #00d4ff;
+            font-weight: 600;
+        }
+        
+        .terms-close {
+            background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 1.5rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .terms-close:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 212, 255, 0.3);
+        }
+        
+        .close-x {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        
+        .close-x:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        /* Ajustes específicos para móvil */
+        @media (max-width: 640px) {
+            .nav-glass {
+                top: 0;
+            }
+            
+            #inicio {
+                padding-top: 6rem;
+            }
+            
+            .payment-card {
+                margin-bottom: 1rem;
+            }
+            
+            .terms-content {
+                padding: 1.5rem;
+                max-height: 85vh;
+            }
+            
+            .terms-title {
+                font-size: 1.5rem;
+            }
+            
+            .terms-body {
+                font-size: 0.9rem;
+            }
+        }
+        
+        /* Prevenir zoom en inputs en iOS */
+        input, select, textarea {
+            font-size: 16px;
+        }
+        
+        /* Nuevos estilos para modales de pago */
+        .payment-option-btn {
+            background: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .payment-option-btn:hover {
+            border-color: #00d4ff;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.2);
+        }
+        
+        .payment-option-btn.selected {
+            border-color: #00d4ff;
+            background: rgba(0, 212, 255, 0.1);
+        }
+        
+        .payment-option-btn h3 {
+            color: #fff;
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .payment-option-btn .price {
+            color: #00d4ff;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        
+        .payment-option-btn .period {
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        .qr-container {
+            background: white;
+            padding: 1rem;
+            border-radius: 16px;
+            margin: 1rem 0;
+            display: inline-block;
+        }
+        
+        .qr-container img {
+            width: 200px;
+            height: 200px;
+        }
+        
+        .binance-id-box {
+            background: rgba(240, 185, 11, 0.1);
+            border: 2px solid #f0b90b;
+            border-radius: 12px;
+            padding: 1rem;
+            margin: 1rem 0;
+            text-align: center;
+        }
+        
+        .binance-id-box p {
+            color: #888;
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .binance-id-box .id-number {
+            color: #f0b90b;
+            font-size: 1.5rem;
+            font-weight: bold;
+            font-family: monospace;
+            letter-spacing: 2px;
+        }
+
+        /* Estilos específicos para el modal de PayPal */
+        #paypal-button-container {
+            width: 100%;
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #paypal-button-container iframe {
+            max-width: 100% !important;
+        }
+
+        .paypal-loading {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .paypal-error {
+            color: #ff4444;
+            text-align: center;
+            padding: 1rem;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Background Grid -->
+    <div class="chart-bg"></div>
+
+    <!-- Trading Ticker -->
+    <div class="trading-ticker py-2">
+        <div class="ticker-wrapper">
+            <span class="mx-6 text-green-400 font-mono text-sm">BTC/USDT <span class="text-white font-bold">$67,245.00</span> <span class="text-green-400">▲ 2.4%</span></span>
+            <span class="mx-6 text-red-400 font-mono text-sm">ETH/USDT <span class="text-white font-bold">$3,521.80</span> <span class="text-red-400">▼ 1.2%</span></span>
+            <span class="mx-6 text-green-400 font-mono text-sm">BNB/USDT <span class="text-white font-bold">$412.35</span> <span class="text-green-400">▲ 0.8%</span></span>
+            <span class="mx-6 text-green-400 font-mono text-sm">SOL/USDT <span class="text-white font-bold">$178.90</span> <span class="text-green-400">▲ 5.2%</span></span>
+            <span class="mx-6 text-red-400 font-mono text-sm">XRP/USDT <span class="text-white font-bold">$0.6234</span> <span class="text-red-400">▼ 0.5%</span></span>
+            <span class="mx-6 text-green-400 font-mono text-sm">ADA/USDT <span class="text-white font-bold">$0.4567</span> <span class="text-green-400">▲ 3.1%</span></span>
+            <span class="mx-6 text-green-400 font-mono text-sm">DOGE/USDT <span class="text-white font-bold">$0.1234</span> <span class="text-green-400">▲ 8.5%</span></span>
+            <span class="mx-6 text-red-400 font-mono text-sm">DOT/USDT <span class="text-white font-bold">$7.234</span> <span class="text-red-400">▼ 2.1%</span></span>
+            <span class="mx-6 text-green-400 font-mono text-sm">MATIC/USDT <span class="text-white font-bold">$0.89</span> <span class="text-green-400">▲ 4.2%</span></span>
+            <span class="mx-6 text-green-400 font-mono text-sm">LINK/USDT <span class="text-white font-bold">$14.56</span> <span class="text-green-400">▲ 1.8%</span></span>
+            <span class="mx-6 text-green-400 font-mono text-sm">BTC/USDT <span class="text-white font-bold">$67,245.00</span> <span class="text-green-400">▲ 2.4%</span></span>
+            <span class="mx-6 text-red-400 font-mono text-sm">ETH/USDT <span class="text-white font-bold">$3,521.80</span> <span class="text-red-400">▼ 1.2%</span></span>
+            <span class="mx-6 text-green-400 font-mono text-sm">BNB/USDT <span class="text-white font-bold">$412.35</span> <span class="text-green-400">▲ 0.8%</span></span>
+            <span class="mx-6 text-green-400 font-mono text-sm">SOL/USDT <span class="text-white font-bold">$178.90</span> <span class="text-green-400">▲ 5.2%</span></span>
+            <span class="mx-6 text-red-400 font-mono text-sm">XRP/USDT <span class="text-white font-bold">$0.6234</span> <span class="text-red-400">▼ 0.5%</span></span>
+            <span class="mx-6 text-green-400 font-mono text-sm">ADA/USDT <span class="text-white font-bold">$0.4567</span> <span class="text-green-400">▲ 3.1%</span></span>
+            <span class="mx-6 text-green-400 font-mono text-sm">DOGE/USDT <span class="text-white font-bold">$0.1234</span> <span class="text-green-400">▲ 8.5%</span></span>
+            <span class="mx-6 text-red-400 font-mono text-sm">DOT/USDT <span class="text-white font-bold">$7.234</span> <span class="text-red-400">▼ 2.1%</span></span>
+            <span class="mx-6 text-green-400 font-mono text-sm">MATIC/USDT <span class="text-white font-bold">$0.89</span> <span class="text-green-400">▲ 4.2%</span></span>
+            <span class="mx-6 text-green-400 font-mono text-sm">LINK/USDT <span class="text-white font-bold">$14.56</span> <span class="text-green-400">▲ 1.8%</span></span>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="nav-glass fixed w-full z-50 top-8 sm:top-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16 sm:h-20">
+                <div class="flex items-center space-x-3">
+                    <div class="relative">
+                        <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-cyan-400 to-purple-600 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-chart-line text-white text-lg sm:text-xl"></i>
+                        </div>
+                        <div class="pulse-ring absolute inset-0 w-10 h-10 sm:w-12 sm:h-12"></div>
+                    </div>
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-bold gradient-text">Vip Signals</h1>
+                        <p class="text-xs text-gray-400 hidden sm:block">By Adberry</p>
+                    </div>
+                </div>
+
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#inicio" class="text-gray-300 hover:text-cyan-400 transition-colors font-medium text-sm">Inicio</a>
+                    <a href="#redes" class="text-gray-300 hover:text-cyan-400 transition-colors font-medium text-sm">Redes</a>
+                    <a href="#pagos" class="text-gray-300 hover:text-cyan-400 transition-colors font-medium text-sm">Pagos</a>
+                    <button onclick="scrollToPayments()" class="glow-button bg-gradient-to-r from-cyan-500 to-purple-600 px-6 py-2 rounded-full font-semibold text-sm hover:shadow-lg hover:shadow-cyan-500/30 transition-all">
+                        Comprar
+                    </button>
+                </div>
+
+                <div class="md:hidden">
+                    <button onclick="toggleMobileMenu()" class="text-white text-xl p-2">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="mobileMenu" class="hidden md:hidden glass-effect border-t border-gray-800 absolute w-full">
+            <div class="px-4 pt-2 pb-4 space-y-1">
+                <a href="#inicio" class="block py-3 text-gray-300 hover:text-cyan-400 border-b border-gray-800">Inicio</a>
+                <a href="#redes" class="block py-3 text-gray-300 hover:text-cyan-400 border-b border-gray-800">Redes</a>
+                <a href="#pagos" class="block py-3 text-gray-300 hover:text-cyan-400">Pagos</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="inicio" class="pt-28 sm:pt-40 pb-12 sm:pb-20 px-4">
+        <div class="max-w-7xl mx-auto text-center">
+            <div class="inline-block mb-4 px-3 py-1 rounded-full bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-500/30">
+                <span class="text-cyan-400 text-xs sm:text-sm font-semibold">🚀 Trading Profesional</span>
+            </div>
+            <h1 class="responsive-text font-bold mb-4 sm:mb-6 leading-tight">
+                Domina los <span class="gradient-text">Mercados</span><br class="hidden sm:block">
+                <span class="text-2xl sm:text-5xl md:text-6xl">con Estrategias Pro</span>
+            </h1>
+            <p class="text-base sm:text-xl text-gray-400 mb-6 sm:mb-10 max-w-2xl mx-auto px-2 sm:px-0">
+                Accede a señales de trading en tiempo real, análisis técnico avanzado y educación financiera de nivel institucional.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4 sm:px-0">
+                <button onclick="scrollToPayments()" class="glow-button bg-gradient-to-r from-cyan-500 to-purple-600 px-6 sm:px-8 py-3 sm:py-4 rounded-full text-base sm:text-lg font-bold hover:shadow-xl hover:shadow-cyan-500/30 transition-all transform hover:scale-105">
+                    Obtener Acceso <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+                <button onclick="scrollToSocial()" class="glass-effect px-6 sm:px-8 py-3 sm:py-4 rounded-full text-base sm:text-lg font-bold hover:bg-white/10 transition-all border border-white/20">
+                    Ver Redes <i class="fas fa-users ml-2"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-12 sm:py-20 px-4">
+        <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
+            <div class="glass-effect rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center">
+                <div class="text-2xl sm:text-4xl font-bold gradient-text mb-1 sm:mb-2">+500</div>
+                <div class="text-gray-400 text-xs sm:text-base">Miembros Activos</div>
+            </div>
+            <div class="glass-effect rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center">
+                <div class="text-2xl sm:text-4xl font-bold gradient-text mb-1 sm:mb-2">85%</div>
+                <div class="text-gray-400 text-xs sm:text-base">Precisión Señales</div>
+            </div>
+            <div class="glass-effect rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center">
+                <div class="text-2xl sm:text-4xl font-bold gradient-text mb-1 sm:mb-2">24/7</div>
+                <div class="text-gray-400 text-xs sm:text-base">Soporte Premium</div>
+            </div>
+            <div class="glass-effect rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center">
+                <div class="text-2xl sm:text-4xl font-bold gradient-text mb-1 sm:mb-2">100%</div>
+                <div class="text-gray-400 text-xs sm:text-base">Satisfacción</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Section -->
+    <section id="redes" class="py-12 sm:py-20 px-4">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-2xl sm:text-4xl font-bold text-center mb-8 sm:mb-12 gradient-text">Síguenos en Redes</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 px-2 sm:px-0">
+                <a href="https://instagram.com/tu_usuario" target="_blank" class="payment-card rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center group">
+                    <i class="fab fa-instagram text-3xl sm:text-4xl mb-2 sm:mb-4 text-pink-500 group-hover:scale-110 transition-transform"></i>
+                    <h3 class="font-semibold text-sm sm:text-base">Instagram</h3>
+                    <p class="text-xs text-gray-400 mt-1 sm:mt-2">@</p>
+                </a>
+                <a href="https://twitter.com/tu_usuario" target="_blank" class="payment-card rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center group">
+                    <i class="fab fa-twitter text-3xl sm:text-4xl mb-2 sm:mb-4 text-blue-400 group-hover:scale-110 transition-transform"></i>
+                    <h3 class="font-semibold text-sm sm:text-base">Twitter</h3>
+                    <p class="text-xs text-gray-400 mt-1 sm:mt-2">@</p>
+                </a>
+                <a href="https://youtube.com/tu_canal" target="_blank" class="payment-card rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center group">
+                    <i class="fab fa-youtube text-3xl sm:text-4xl mb-2 sm:mb-4 text-red-500 group-hover:scale-110 transition-transform"></i>
+                    <h3 class="font-semibold text-sm sm:text-base">YouTube</h3>
+                    <p class="text-xs text-gray-400 mt-1 sm:mt-2">@</p>
+                </a>
+                <a href="https://tiktok.com/@tu_usuario" target="_blank" class="payment-card rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center group">
+                    <i class="fab fa-tiktok text-3xl sm:text-4xl mb-2 sm:mb-4 text-white group-hover:scale-110 transition-transform"></i>
+                    <h3 class="font-semibold text-sm sm:text-base">TikTok</h3>
+                    <p class="text-xs text-gray-400 mt-1 sm:mt-2">@</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Payments Section -->
+    <section id="pagos" class="py-12 sm:py-20 px-4">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-2xl sm:text-4xl font-bold text-center mb-3 sm:mb-4 gradient-text">Métodos de Pago</h2>
+            <p class="text-center text-gray-400 mb-8 sm:mb-12 text-sm sm:text-base px-4">Elige tu método de pago preferido y obtén acceso inmediato</p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12 px-2 sm:px-0">
+                
+                <!-- Stripe Card -->
+                <div class="payment-card rounded-xl sm:rounded-2xl p-4 sm:p-6 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-purple-500/20 to-transparent rounded-full -mr-12 -mt-12 sm:-mr-16 sm:-mt-16"></div>
+                    <div class="flex items-center mb-3 sm:mb-4">
+                        <i class="fab fa-cc-stripe text-3xl sm:text-4xl text-purple-400 mr-3"></i>
+                        <div>
+                            <h3 class="text-lg sm:text-xl font-bold">Tarjeta/Stripe</h3>
+                            <p class="text-xs sm:text-sm text-gray-400">Pago seguro con tarjeta</p>
+                        </div>
+                    </div>
+                    <div class="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">$99<span class="text-base sm:text-lg text-gray-400">/mes</span></div>
+                    <button onclick="showStripeOptions()" class="w-full glow-button bg-gradient-to-r from-purple-500 to-purple-700 py-2.5 sm:py-3 rounded-xl font-semibold text-sm sm:text-base hover:shadow-lg transition-all">
+                        Pagar con Stripe
+                    </button>
+                </div>
+
+                <!-- PayPal Card -->
+                <div class="payment-card rounded-xl sm:rounded-2xl p-4 sm:p-6 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-blue-500/20 to-transparent rounded-full -mr-12 -mt-12 sm:-mr-16 sm:-mt-16"></div>
+                    <div class="flex items-center mb-3 sm:mb-4">
+                        <i class="fab fa-paypal text-3xl sm:text-4xl text-blue-400 mr-3"></i>
+                        <div>
+                            <h3 class="text-lg sm:text-xl font-bold">PayPal</h3>
+                            <p class="text-xs sm:text-sm text-gray-400">Pago rápido y seguro</p>
+                        </div>
+                    </div>
+                    <div class="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">$99<span class="text-base sm:text-lg text-gray-400">/mes</span></div>
+                    <button onclick="openPayPalPayment()" class="w-full glow-button bg-gradient-to-r from-blue-500 to-blue-700 py-2.5 sm:py-3 rounded-xl font-semibold text-sm sm:text-base hover:shadow-lg transition-all">
+                        Pagar con PayPal
+                    </button>
+                </div>
+
+                <!-- Binance Pay Card -->
+                <div class="payment-card rounded-xl sm:rounded-2xl p-4 sm:p-6 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-yellow-500/20 to-transparent rounded-full -mr-12 -mt-12 sm:-mr-16 sm:-mt-16"></div>
+                    <div class="flex items-center mb-3 sm:mb-4">
+                        <i class="fas fa-coins text-3xl sm:text-4xl text-yellow-400 mr-3"></i>
+                        <div>
+                            <h3 class="text-lg sm:text-xl font-bold">Binance Pay</h3>
+                            <p class="text-xs sm:text-sm text-gray-400">Pago con cripto</p>
+                        </div>
+                    </div>
+                    <div class="text-2xl sm:text-3xl font-bold mb-2 sm:mb-4">$99<span class="text-base sm:text-lg text-gray-400">/mes</span></div>
+                    <button onclick="showBinanceOptions()" class="w-full glow-button bg-gradient-to-r from-yellow-500 to-yellow-600 py-2.5 sm:py-3 rounded-xl font-semibold text-sm sm:text-base hover:shadow-lg transition-all text-black">
+                        Pagar con Binance
+                    </button>
+                </div>
+
+                <!-- SPEI/Transferencia Card -->
+                <div class="payment-card rounded-xl sm:rounded-2xl p-4 sm:p-6 relative overflow-hidden sm:col-span-2 lg:col-span-3">
+                    <div class="absolute top-0 right-0 w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-green-500/20 to-transparent rounded-full -mr-12 -mt-12 sm:-mr-16 sm:-mt-16"></div>
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div class="flex items-center">
+                            <i class="fas fa-university text-3xl sm:text-4xl text-green-400 mr-3"></i>
+                            <div class="text-center sm:text-left">
+                                <h3 class="text-lg sm:text-xl font-bold">Transferencia SPEI</h3>
+                                <p class="text-xs sm:text-sm text-gray-400">Transferencia bancaria directa</p>
+                            </div>
+                        </div>
+                        <div class="text-2xl sm:text-3xl font-bold">$99<span class="text-base sm:text-lg text-gray-400">/mes</span></div>
+                        <button onclick="showTransferOptions()" class="glow-button bg-gradient-to-r from-green-500 to-green-700 px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl font-semibold text-sm sm:text-base hover:shadow-lg transition-all w-full sm:w-auto">
+                            Ver Datos Bancarios
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Success/Unlock Section -->
+            <div id="unlockSection" class="hidden-section glass-effect rounded-xl sm:rounded-2xl p-6 sm:p-8 text-center border-2 border-green-500/50 mx-2 sm:mx-0">
+                <div class="w-16 h-16 sm:w-20 sm:h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                    <i class="fas fa-check text-3xl sm:text-4xl text-green-400"></i>
+                </div>
+                <h3 class="text-xl sm:text-2xl font-bold mb-2 text-green-400">¡Pago Exitoso!</h3>
+                <p class="text-gray-300 mb-4 sm:mb-6 text-sm sm:text-base">Tu acceso ha sido desbloqueado. Descarga tu comprobante y únete a nuestro grupo de Telegram.</p>
+                
+                <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+                    <button onclick="downloadReceipt()" class="glow-button bg-gradient-to-r from-cyan-500 to-blue-500 px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl font-semibold text-sm sm:text-base hover:shadow-lg transition-all">
+                        <i class="fas fa-download mr-2"></i> Descargar Comprobante
+                    </button>
+                    <a href="https://t.me/tu_bot?start=verificar" target="_blank" class="glow-button bg-gradient-to-r from-blue-500 to-blue-700 px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl font-semibold text-sm sm:text-base hover:shadow-lg transition-all inline-flex items-center justify-center">
+                        <i class="fab fa-telegram mr-2"></i> Enviar Comprobante
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/10 py-8 sm:py-12 px-4 mt-12 sm:mt-20">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 mb-6 sm:mb-8 text-center">
+                <div>
+                    <div class="flex items-center justify-center space-x-2 mb-3 sm:mb-4">
+                        <div class="w-8 h-8 bg-gradient-to-br from-cyan-400 to-purple-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-chart-line text-white text-sm"></i>
+                        </div>
+                        <span class="text-lg sm:text-xl font-bold gradient-text">Vip Signals</span>
+                    </div>
+                    <p class="text-gray-400 text-xs sm:text-sm px-4 sm:px-0">Educación y señales de trading profesional para traders ambiciosos.</p>
+                </div>
+                
+                <div class="text-center">
+                    <h4 class="font-semibold mb-3 sm:mb-4 text-sm sm:text-base">Enlaces</h4>
+                    <ul class="space-y-2 text-xs sm:text-sm text-gray-400">
+                        <li><a href="#inicio" class="hover:text-cyan-400 transition-colors">Inicio</a></li>
+                        <li><a href="#redes" class="hover:text-cyan-400 transition-colors">Redes Sociales</a></li>
+                        <li><a href="#pagos" class="hover:text-cyan-400 transition-colors">Métodos de Pago</a></li>
+                    </ul>
+                </div>
+                
+                <div class="text-center">
+                    <h4 class="font-semibold mb-3 sm:mb-4 text-sm sm:text-base">Legal</h4>
+                    <ul class="space-y-2 text-xs sm:text-sm text-gray-400">
+                        <li class="text-center">
+                            <button onclick="showTerms()" class="hover:text-cyan-400 transition-colors text-center w-full">Términos y Condiciones</button>
+                        </li>
+                        <li class="text-center">
+                            <button onclick="showPrivacy()" class="hover:text-cyan-400 transition-colors text-center w-full">Política de Privacidad</button>
+                        </li>
+                        <li class="text-center">
+                            <a href="mailto:adberryt@gmaiil.com" class="hover:text-cyan-400 transition-colors">Contacto</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-white/10 pt-6 sm:pt-8 flex flex-col sm:flex-row justify-between items-center gap-2 text-center">
+                <p class="text-gray-500 text-xs sm:text-sm w-full sm:w-auto">&copy; 2026 Trading Pro. Create by Adberry</p>
+                <p class="text-gray-600 text-xs w-full sm:w-auto">Todos los derechos reservados</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="success-modal">
+        <div class="success-content">
+            <div class="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-cyan-400 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                <i class="fas fa-check text-2xl sm:text-4xl text-white"></i>
+            </div>
+            <h2 class="text-xl sm:text-2xl font-bold mb-2">¡Pago Procesado!</h2>
+            <p class="text-gray-400 mb-4 sm:mb-6 text-sm sm:text-base">Tu transacción se ha completado exitosamente.</p>
+            <button onclick="closeSuccessModal()" class="glow-button bg-gradient-to-r from-cyan-500 to-purple-600 px-6 sm:px-8 py-2.5 sm:py-3 rounded-full font-semibold text-sm sm:text-base w-full">
+                Continuar
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL: PayPal Payment - NUEVO MODAL CORREGIDO -->
+    <div id="paypalModal" class="terms-modal">
+        <div class="terms-content">
+            <button class="close-x" onclick="closeModal('paypalModal')">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="terms-header">
+                <h2 class="terms-title">💳 Pagar con PayPal</h2>
+                <p class="text-gray-400 text-sm">Suscripción mensual automática</p>
+            </div>
+            
+            <div class="terms-body" style="text-align: center; padding: 2rem 0;">
+                <div class="price" style="font-size: 3rem; color: #00d4ff; margin-bottom: 0.5rem;">$99</div>
+                <div class="period" style="color: #888; margin-bottom: 2rem;">USD / mes - Pago recurrente</div>
+                
+                <!-- Aquí se renderizará el botón de PayPal -->
+                <div id="paypal-button-container">
+                    <p class="paypal-loading">Cargando PayPal...</p>
+                </div>
+                
+                <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(0,0,0,0.3); border-radius: 12px;">
+                    <p style="color: #888; font-size: 0.85rem; line-height: 1.5;">
+                        <i class="fas fa-shield-alt" style="color: #00d4ff; margin-right: 0.5rem;"></i>
+                        Pago seguro procesado por PayPal. Puedes cancelar en cualquier momento desde tu cuenta de PayPal.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Opciones de Stripe -->
+    <div id="stripeOptionsModal" class="terms-modal">
+        <div class="terms-content">
+            <button class="close-x" onclick="closeModal('stripeOptionsModal')">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="terms-header">
+                <h2 class="terms-title">💳 Pagar con Stripe</h2>
+                <p class="text-gray-400 text-sm">Elige tu plan de suscripción</p>
+            </div>
+            
+            <div class="terms-body">
+                <div class="payment-option-btn" onclick="selectStripePlan('monthly')">
+                    <h3>📅 Plan Mensual</h3>
+                    <div class="price">$99</div>
+                    <div class="period">USD / mes</div>
+                    <p style="color: #888; font-size: 0.8rem; margin-top: 0.5rem;">Pago recurrente mensual</p>
+                </div>
+                
+                <div class="payment-option-btn" onclick="selectStripePlan('yearly')">
+                    <h3>🎯 Plan Anual</h3>
+                    <div class="price">$999</div>
+                    <div class="period">USD / año</div>
+                    <p style="color: #00d4ff; font-size: 0.8rem; margin-top: 0.5rem;">¡Ahorra 3 meses! (16.5% off)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Opciones de Binance -->
+    <div id="binanceOptionsModal" class="terms-modal">
+        <div class="terms-content">
+            <button class="close-x" onclick="closeModal('binanceOptionsModal')">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="terms-header">
+                <h2 class="terms-title">🪙 Pagar con Binance</h2>
+                <p class="text-gray-400 text-sm">Elige tu plan y método de pago</p>
+            </div>
+            
+            <div class="terms-body">
+                <div class="payment-option-btn" onclick="selectBinancePlan('monthly')">
+                    <h3>📅 Plan Mensual</h3>
+                    <div class="price">$20</div>
+                    <div class="period">USD / mes</div>
+                </div>
+                
+                <div class="payment-option-btn" onclick="selectBinancePlan('yearly')">
+                    <h3>🎯 Plan Anual</h3>
+                    <div class="price">$200</div>
+                    <div class="period">USD / año</div>
+                    <p style="color: #00d4ff; font-size: 0.8rem; margin-top: 0.5rem;">¡Ahorra 2 meses!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Detalles de Binance (ID + QR) -->
+    <div id="binanceDetailsModal" class="terms-modal">
+        <div class="terms-content">
+            <button class="close-x" onclick="closeModal('binanceDetailsModal')">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="terms-header">
+                <h2 class="terms-title">🪙 Pago con Binance</h2>
+                <p class="text-gray-400 text-sm">Escanea el QR o usa el ID</p>
+            </div>
+            
+            <div class="terms-body" style="text-align: center;">
+                <div class="qr-container">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=binance://pay?amount=99&currency=USDT" alt="QR Binance" id="binanceQR">
+                </div>
+                
+                <p style="color: #888; margin: 1rem 0;">O usa el ID de Binance:</p>
+                
+                <div class="binance-id-box">
+                    <p>ID de Binance</p>
+                    <div class="id-number" id="binanceIdDisplay">123456789</div>
+                    <button onclick="copyBinanceIdFromModal()" style="background: #f0b90b; color: #000; border: none; padding: 0.5rem 1rem; border-radius: 8px; margin-top: 0.5rem; cursor: pointer; font-weight: bold;">
+                        📋 Copiar
+                    </button>
+                </div>
+                
+                <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 12px; margin-top: 1rem; text-align: left;">
+                    <p style="color: #fff; font-weight: bold; margin-bottom: 0.5rem;">📱 Instrucciones:</p>
+                    <ol style="color: #aaa; font-size: 0.9rem; line-height: 1.6; padding-left: 1.2rem;">
+                        <li>Abre tu app de Binance</li>
+                        <li>Ve a <strong style="color: #f0b90b;">Pay</strong> → <strong style="color: #f0b90b;">Enviar</strong></li>
+                        <li>Escanea el QR o pega el ID</li>
+                        <li>Monto: <strong style="color: #fff;" id="binanceAmount">$99 USDT</strong></li>
+                        <li>Red: <strong style="color: #fff;">Tron (TRC20)</strong></li>
+                    </ol>
+                </div>
+            </div>
+            
+            <button class="terms-close" onclick="confirmBinancePayment()">
+                ✅ Ya realicé el pago
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL: Opciones de Transferencia SPEI -->
+    <div id="transferOptionsModal" class="terms-modal">
+        <div class="terms-content">
+            <button class="close-x" onclick="closeModal('transferOptionsModal')">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="terms-header">
+                <h2 class="terms-title">🏦 Transferencia SPEI</h2>
+                <p class="text-gray-400 text-sm">Elige tu plan</p>
+            </div>
+            
+            <div class="terms-body">
+                <div class="payment-option-btn" onclick="selectTransferPlan('monthly')">
+                    <h3>📅 Plan Mensual</h3>
+                    <div class="price">$20</div>
+                    <div class="period">USD / mes</div>
+                    <p style="color: #888; font-size: 0.8rem; margin-top: 0.5rem;">Equivalente en MXN según tipo de cambio</p>
+                </div>
+                
+                <div class="payment-option-btn" onclick="selectTransferPlan('yearly')">
+                    <h3>🎯 Plan Anual</h3>
+                    <div class="price">$200</div>
+                    <div class="period">USD / año</div>
+                    <p style="color: #00d4ff; font-size: 0.8rem; margin-top: 0.5rem;">¡Ahorra 2 meses!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Detalles de Transferencia -->
+    <div id="transferDetailsModal" class="terms-modal">
+        <div class="terms-content">
+            <button class="close-x" onclick="closeModal('transferDetailsModal')">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="terms-header">
+                <h2 class="terms-title">🏦 Datos Bancarios</h2>
+                <p class="text-gray-400 text-sm">Realiza tu transferencia SPEI</p>
+            </div>
+            
+            <div class="terms-body">
+                <div style="background: rgba(0, 212, 255, 0.1); border: 1px solid rgba(0, 212, 255, 0.3); border-radius: 12px; padding: 1rem; margin-bottom: 1rem;">
+                    <p style="color: #00d4ff; font-weight: bold; font-size: 1.2rem;">Monto a transferir:</p>
+                    <p style="color: #fff; font-size: 1.5rem; font-weight: bold;" id="transferAmount">$99 USD</p>
+                    <p style="color: #888; font-size: 0.8rem;">(Equivalente en MXN según tipo de cambio del día)</p>
+                </div>
+                
+                <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 12px; margin-bottom: 1rem;">
+                    <div style="margin-bottom: 1rem;">
+                        <p style="color: #888; font-size: 0.8rem;">Banco:</p>
+                        <p style="color: #fff; font-weight: bold;">Azteca</p>
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <p style="color: #888; font-size: 0.8rem;">Titular:</p>
+                        <p style="color: #fff; font-weight: bold;">Mariana Alvarado</p>
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <p style="color: #888; font-size: 0.8rem;">CLABE:</p>
+                        <p style="color: #00ff88; font-family: monospace; font-weight: bold; font-size: 1.1rem;" id="clabeDisplay">Pendiente</p>
+                    </div>
+                    <div>
+                        <p style="color: #888; font-size: 0.8rem;">Cuenta:</p>
+                        <p style="color: #00ff88; font-family: monospace; font-weight: bold; font-size: 1.1rem;" id="accountDisplay">Pendiente</p>
+                    </div>
+                </div>
+                
+                <p style="color: #888; font-size: 0.8rem; text-align: center;">⚠️ Envía el comprobante por Telegram después de realizar la transferencia</p>
+            </div>
+            
+            <button class="terms-close" onclick="confirmTransferPayment()">
+                ✅ Ya realicé la transferencia
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL UNIFICADO - Términos y Condiciones -->
+    <div id="termsModal" class="terms-modal">
+        <div class="terms-content">
+            <button class="close-x" onclick="closeModal('termsModal')">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="terms-header">
+                <h2 class="terms-title">📋 Términos y Condiciones</h2>
+                <p class="text-gray-400 text-sm">Última actualización: 2026</p>
+            </div>
+            
+            <div class="terms-body">
+                <p><strong>1. Servicios:</strong> Trading Pro proporciona señales de trading, educación y análisis de mercado. Todo el contenido es educativo y no constituye asesoramiento financiero personalizado.</p>
+                
+                <p><strong>2. Pagos:</strong> Todos los pagos son procesados de forma segura a través de Stripe, PayPal, Binance Pay o transferencia bancaria. Los precios están en USD y pueden estar sujetos a impuestos locales.</p>
+                
+                <p><strong>3. Reembolsos:</strong> No se realizan reembolsos una vez otorgado el acceso al contenido digital, salvo que la ley aplicable exija lo contrario.</p>
+                
+                <p><strong>4. Riesgos:</strong> El trading conlleva riesgos significativos de pérdida. Pasados rendimientos no garantizan resultados futuros. Opera bajo tu propio riesgo.</p>
+                
+                <p><strong>5. Propiedad:</strong> Todo el contenido es propiedad intelectual de Vip Signals y no puede ser compartido, revendido o distribuido sin autorización expresa.</p>
+                
+                <p><strong>6. Cancelación:</strong> Puedes cancelar tu suscripción en cualquier momento, pero no se reembolsarán los períodos pagados.</p>
+            </div>
+            
+            <button class="terms-close" onclick="closeModal('termsModal')">
+                Aceptar y Cerrar
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL UNIFICADO - Política de Privacidad -->
+    <div id="privacyModal" class="terms-modal">
+        <div class="terms-content">
+            <button class="close-x" onclick="closeModal('privacyModal')">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="terms-header">
+                <h2 class="terms-title">🔒 Política de Privacidad</h2>
+                <p class="text-gray-400 text-sm">Tu información está segura con nosotros</p>
+            </div>
+            
+            <div class="terms-body">
+                <p><strong>1. Protección de Datos:</strong> Protegemos tus datos personales con encriptación SSL de 256 bits y cumplimos con GDPR, CCPA y leyes locales de protección de datos.</p>
+                
+                <p><strong>2. Información Recopilada:</strong> Solo recopilamos información necesaria para procesar pagos y proporcionar acceso al servicio (nombre, email, datos de pago seguros).</p>
+                
+                <p><strong>3. Uso de Información:</strong> No compartimos, vendemos ni distribuimos tu información personal a terceros sin tu consentimiento explícito.</p>
+                
+                <p><strong>4. Seguridad:</strong> Utilizamos estándares bancarios de seguridad. Las transacciones son procesadas directamente por Stripe/PayPal; nosotros no almacenamos datos de tarjetas.</p>
+                
+                <p><strong>5. Cookies:</strong> Usamos cookies esenciales para el funcionamiento del sitio y análisis anónimos de tráfico. Puedes desactivarlas en tu navegador.</p>
+                
+                <p><strong>6. Derechos:</strong> Tienes derecho a acceder, rectificar o eliminar tus datos personales. Contacta a soporte para ejercer estos derechos.</p>
+            </div>
+            
+            <button class="terms-close" onclick="closeModal('privacyModal')">
+                Aceptar y Cerrar
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Forzar HTTPS
+        if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
+            window.location.href = 'https://' + window.location.host + window.location.pathname;
+        }
+
+        // Configuración
+        const CONFIG = {
+            stripe: {
+                publicKey: 'pk_live_51SgaUKRvcXwFOa1F7bMFEu5kKlDMLdJJvfEyNs3qG494smOCL1EaBE4oA1rlwMbgWyQw9xUWKKMbyeaRvkOOFw0400tpL1LJLO',
+                priceIdMonthly: 'price_1T5GIMRvcXwFOa1Fh8Sj9PjD',
+                priceIdYearly: 'price_ANUAL_AQUI',
+                yearlyUrl: 'https://tusitio.com/pago-anual'
+            },
+            paypal: {
+                clientId: 'AVjTdGMw6FyI8iSjt28TbzfisEeEd-9fj5JDjvAmx2neBIaj4rg_RCrrJdoOHEjZdwkQ79SmNYJstVUB',
+                planId: 'P-2DA12049A07246311NGR46FA'
+            },
+            binance: {
+                id: '1221363673',
+                qrUrl: 'https://s.binance.com/srNSS1DS',
+                yearlyUrl: 'https://tusitio.com/pago-anual-binance'
+            },
+            telegram: {
+                botLink: 'https://t.me/tu_bot?start=verificar',
+                groupLink: 'https://t.me/tu_grupo_premium'
+            },
+            bank: {
+                name: 'Azteca',
+                holder: 'Mariana Alvarado',
+                clabe: 'Pendiente',
+                account: 'Pendiente',
+                yearlyUrl: 'https://tusitio.com/pago-anual-transferencia'
+            }
+        };
+
+        let selectedPlan = '';
+        let selectedMethod = '';
+        let paypalScriptLoaded = false;
+
+        // Inicializar Stripe
+        let stripe;
+        if (CONFIG.stripe.publicKey.includes('TU_')) {
+            console.warn('⚠️ Configura tus credenciales de Stripe en CONFIG.stripe');
+        } else {
+            stripe = Stripe(CONFIG.stripe.publicKey);
+        }
+
+        // Funciones de Navegación
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        function scrollToPayments() {
+            document.getElementById('pagos').scrollIntoView({ behavior: 'smooth' });
+            document.getElementById('mobileMenu').classList.add('hidden');
+        }
+
+        function scrollToSocial() {
+            document.getElementById('redes').scrollIntoView({ behavior: 'smooth' });
+            document.getElementById('mobileMenu').classList.add('hidden');
+        }
+
+        // ==================== STRIPE ====================
+        function showStripeOptions() {
+            openModal('stripeOptionsModal');
+        }
+
+        function selectStripePlan(plan) {
+            selectedPlan = plan;
+            closeModal('stripeOptionsModal');
+            createFloatingEmojis();
+            
+            if (plan === 'yearly') {
+                setTimeout(() => {
+                    window.location.href = CONFIG.stripe.yearlyUrl;
+                }, 1500);
+            } else {
+                processStripeMonthly();
+            }
+        }
+
+        function processStripeMonthly() {
+            if (!stripe) {
+                alert('⚠️ Stripe no está configurado correctamente.');
+                return;
+            }
+            
+            stripe.redirectToCheckout({
+                lineItems: [{ 
+                    price: CONFIG.stripe.priceIdMonthly, 
+                    quantity: 1 
+                }],
+                mode: 'subscription',
+                successUrl: window.location.origin + window.location.pathname + '?payment=success',
+                cancelUrl: window.location.origin + window.location.pathname + '?payment=cancelled',
+            }).then(function (result) {
+                if (result.error) {
+                    alert(result.error.message);
+                }
+            });
+        }
+
+        // ==================== BINANCE ====================
+        function showBinanceOptions() {
+            openModal('binanceOptionsModal');
+        }
+
+        function selectBinancePlan(plan) {
+            selectedPlan = plan;
+            closeModal('binanceOptionsModal');
+            
+            if (plan === 'yearly') {
+                createFloatingEmojis();
+                setTimeout(() => {
+                    window.location.href = CONFIG.binance.yearlyUrl;
+                }, 1500);
+            } else {
+                showBinanceDetails();
+            }
+        }
+
+        function showBinanceDetails() {
+            document.getElementById('binanceAmount').textContent = '$99 USDT';
+            document.getElementById('binanceIdDisplay').textContent = CONFIG.binance.id;
+            document.getElementById('binanceQR').src = CONFIG.binance.qrUrl + '?amount=99&currency=USDT&to=' + CONFIG.binance.id;
+            
+            openModal('binanceDetailsModal');
+            createFloatingEmojis();
+        }
+
+        function copyBinanceIdFromModal() {
+            navigator.clipboard.writeText(CONFIG.binance.id).then(() => {
+                alert('✅ ID copiado: ' + CONFIG.binance.id);
+            });
+        }
+
+        function confirmBinancePayment() {
+            closeModal('binanceDetailsModal');
+            createFloatingEmojis();
+            showSuccess();
+        }
+
+        // ==================== TRANSFERENCIA SPEI ====================
+        function showTransferOptions() {
+            openModal('transferOptionsModal');
+        }
+
+        function selectTransferPlan(plan) {
+            selectedPlan = plan;
+            closeModal('transferOptionsModal');
+            
+            if (plan === 'yearly') {
+                createFloatingEmojis();
+                setTimeout(() => {
+                    window.location.href = CONFIG.bank.yearlyUrl;
+                }, 1500);
+            } else {
+                showTransferDetails();
+            }
+        }
+
+        function showTransferDetails() {
+            document.getElementById('transferAmount').textContent = '$99 USD';
+            document.getElementById('clabeDisplay').textContent = CONFIG.bank.clabe;
+            document.getElementById('accountDisplay').textContent = CONFIG.bank.account;
+            
+            openModal('transferDetailsModal');
+            createFloatingEmojis();
+        }
+
+        function confirmTransferPayment() {
+            closeModal('transferDetailsModal');
+            createFloatingEmojis();
+            showSuccess();
+        }
+
+        // ==================== PAYPAL CORREGIDO ====================
+        function openPayPalPayment() {
+            if (CONFIG.paypal.clientId.includes('TU_')) {
+                alert('⚠️ PayPal no está configurado. Configura tu Client ID en el código.');
+                return;
+            }
+            
+            createFloatingEmojis();
+            
+            // Abrir el modal primero
+            openModal('paypalModal');
+            
+            // Limpiar contenedor
+            const container = document.getElementById('paypal-button-container');
+            container.innerHTML = '<p class="paypal-loading">Cargando PayPal...</p>';
+            
+            // Cargar script de PayPal si no está cargado
+            if (!window.paypal) {
+                const script = document.createElement('script');
+                script.src = `https://www.paypal.com/sdk/js?client-id=${CONFIG.paypal.clientId}&vault=true&intent=subscription&currency=USD`;
+                script.onload = function() {
+                    paypalScriptLoaded = true;
+                    renderPayPalButton();
+                };
+                script.onerror = function() {
+                    container.innerHTML = '<p class="paypal-error">Error al cargar PayPal. Intenta de nuevo.</p>';
+                };
+                document.body.appendChild(script);
+            } else {
+                renderPayPalButton();
+            }
+        }
+
+        function renderPayPalButton() {
+            const container = document.getElementById('paypal-button-container');
+            container.innerHTML = '';
+            
+            if (!window.paypal) {
+                container.innerHTML = '<p class="paypal-error">Error: PayPal no disponible</p>';
+                return;
+            }
+            
+            try {
+                paypal.Buttons({
+                    style: {
+                        layout: 'vertical',
+                        color: 'gold',
+                        shape: 'rect',
+                        label: 'subscribe'
+                    },
+                    createSubscription: function(data, actions) {
+                        return actions.subscription.create({
+                            'plan_id': CONFIG.paypal.planId
+                        });
+                    },
+                    onApprove: function(data, actions) {
+                        console.log('Suscripción creada:', data);
+                        
+                        // Cerrar modal y mostrar éxito
+                        closeModal('paypalModal');
+                        
+                        setTimeout(() => {
+                            alert('✅ ¡Suscripción creada exitosamente!\n\nID: ' + data.subscriptionID + '\n\nRevisa tu email para confirmar.');
+                            showSuccess();
+                        }, 300);
+                    },
+                    onError: function(err) {
+                        console.error('Error PayPal:', err);
+                        container.innerHTML = '<div class="paypal-error"><p>Error en el pago. Intenta de nuevo.</p><p style="font-size: 0.8rem; margin-top: 0.5rem;">' + (err.message || 'Error desconocido') + '</p></div>';
+                    },
+                    onCancel: function() {
+                        container.innerHTML = '<p style="color: #888; text-align: center;">Pago cancelado. Puedes intentar de nuevo cuando quieras.</p>';
+                        setTimeout(() => {
+                            renderPayPalButton();
+                        }, 2000);
+                    }
+                }).render('#paypal-button-container');
+            } catch (error) {
+                console.error('Error renderizando PayPal:', error);
+                container.innerHTML = '<p class="paypal-error">Error técnico. Recarga la página e intenta de nuevo.</p>';
+            }
+        }
+
+        // ==================== FUNCIONES COMUNES ====================
+        function showSuccess() {
+            createFloatingEmojis();
+            const modal = document.getElementById('successModal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+            
+            setTimeout(() => {
+                const unlockSection = document.getElementById('unlockSection');
+                unlockSection.classList.remove('hidden-section');
+                unlockSection.classList.add('visible-section');
+                unlockSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 1500);
+        }
+
+        function closeSuccessModal() {
+            const modal = document.getElementById('successModal');
+            modal.classList.remove('active');
+            setTimeout(() => modal.style.display = 'none', 300);
+        }
+
+        function downloadReceipt() {
+            const receiptData = {
+                orderId: 'TRX-' + Date.now(),
+                date: new Date().toLocaleString(),
+                amount: '$99.00 USD',
+                description: 'Trading Pro Premium - 1 Mes',
+                status: 'Pagado',
+                paymentMethod: 'Múltiple'
+            };
+
+            const receiptContent = `
+COMPROBANTE DE PAGO - TRADING PRO
+================================
+Orden: ${receiptData.orderId}
+Fecha: ${receiptData.date}
+Monto: ${receiptData.amount}
+Descripción: ${receiptData.description}
+Estado: ${receiptData.status}
+================================
+Gracias por tu compra
+Create by Adberry
+            `;
+
+            const blob = new Blob([receiptContent], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Comprobante_${receiptData.orderId}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+
+            generateVisualReceipt(receiptData);
+        }
+
+        function generateVisualReceipt(data) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 600;
+            canvas.height = 400;
+            const ctx = canvas.getContext('2d');
+
+            const gradient = ctx.createLinearGradient(0, 0, 600, 400);
+            gradient.addColorStop(0, '#0a0e1a');
+            gradient.addColorStop(1, '#1a1f2e');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 600, 400);
+
+            ctx.strokeStyle = '#00d4ff';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(10, 10, 580, 380);
+
+            ctx.fillStyle = '#00d4ff';
+            ctx.font = 'bold 30px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('TRADING PRO', 300, 60);
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '20px Arial';
+            ctx.fillText('Comprobante de Pago', 300, 90);
+
+            ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(50, 110);
+            ctx.lineTo(550, 110);
+            ctx.stroke();
+
+            ctx.textAlign = 'left';
+            ctx.font = '16px Arial';
+            ctx.fillStyle = '#aaaaaa';
+            ctx.fillText('Orden:', 50, 150);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText(data.orderId, 200, 150);
+
+            ctx.fillStyle = '#aaaaaa';
+            ctx.fillText('Fecha:', 50, 180);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText(data.date, 200, 180);
+
+            ctx.fillStyle = '#aaaaaa';
+            ctx.fillText('Monto:', 50, 210);
+            ctx.fillStyle = '#00ff88';
+            ctx.font = 'bold 20px Arial';
+            ctx.fillText(data.amount, 200, 210);
+
+            ctx.font = '16px Arial';
+            ctx.fillStyle = '#aaaaaa';
+            ctx.fillText('Descripción:', 50, 240);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText(data.description, 200, 240);
+
+            ctx.fillStyle = '#aaaaaa';
+            ctx.fillText('Estado:', 50, 270);
+            ctx.fillStyle = '#00ff88';
+            ctx.fillText('✓ ' + data.status, 200, 270);
+
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#666666';
+            ctx.font = '12px Arial';
+            ctx.fillText('Create by Adberry - Trading Pro © 2024', 300, 350);
+
+            const link = document.createElement('a');
+            link.download = `Comprobante_${data.orderId}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+
+        function createFloatingEmojis() {
+            const emojis = ['🍀', '💎', '📊'];
+            const colors = ['#00ff88', '#00d4ff', '#ff00ff'];
+            
+            for (let i = 0; i < 15; i++) {
+                setTimeout(() => {
+                    const emoji = document.createElement('div');
+                    emoji.className = 'floating-emoji';
+                    emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                    emoji.style.left = Math.random() * window.innerWidth + 'px';
+                    emoji.style.top = window.innerHeight + 'px';
+                    emoji.style.color = colors[Math.floor(Math.random() * colors.length)];
+                    emoji.style.fontSize = (Math.random() * 15 + 15) + 'px';
+                    document.body.appendChild(emoji);
+                    
+                    setTimeout(() => emoji.remove(), 3000);
+                }, i * 80);
+            }
+        }
+
+        function copyBinanceId() {
+            const id = document.getElementById('binanceId').textContent;
+            navigator.clipboard.writeText(id).then(() => {
+                alert('ID de Binance copiado: ' + id);
+            });
+        }
+
+        function showTerms() {
+            openModal('termsModal');
+        }
+
+        function showPrivacy() {
+            openModal('privacyModal');
+        }
+
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.remove('active');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                // Limpiar PayPal cuando se cierra el modal
+                if (modalId === 'paypalModal') {
+                    const container = document.getElementById('paypal-button-container');
+                    if (container) container.innerHTML = '';
+                }
+                document.body.style.overflow = '';
+            }, 300);
+        }
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('terms-modal')) {
+                closeModal(event.target.id);
+            }
+            if (event.target.id === 'successModal') {
+                closeSuccessModal();
+            }
+        }
+
+        window.addEventListener('load', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('payment') === 'success') {
+                showSuccess();
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        });
+
+        document.addEventListener('click', function(event) {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const menuButton = document.querySelector('button[onclick="toggleMobileMenu()"]');
+            
+            if (!mobileMenu.contains(event.target) && !menuButton.contains(event.target)) {
+                mobileMenu.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
