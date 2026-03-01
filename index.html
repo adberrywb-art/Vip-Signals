@@ -1181,12 +1181,19 @@
         }
 
         function showBinanceDetails() {
-            document.getElementById('binanceAmount').textContent = '$99 USDT';
-            document.getElementById('binanceIdDisplay').textContent = CONFIG.binance.id;
-            document.getElementById('binanceQR').src = CONFIG.binance.qrUrl + '?amount=99&currency=USDT&to=' + CONFIG.binance.id;
-            
-            openModal('binanceDetailsModal');
-            createFloatingEmojis();
+    const amount = selectedPlan === 'yearly' ? '200' : '99';
+    document.getElementById('binanceAmount').textContent = '$' + amount + ' USDT';
+    document.getElementById('binanceIdDisplay').textContent = CONFIG.binance.id;
+    
+    // GENERAR QR AUTOMÁTICAMENTE con el ID de Binance
+    // Usamos una API gratuita que genera el QR con los datos de pago
+    const qrData = 'https://s.binance.com/' + CONFIG.binance.id + '?amount=' + amount + '&currency=USDT';
+    const qrApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(qrData);
+    
+    document.getElementById('binanceQR').src = qrApiUrl;
+    
+    openModal('binanceDetailsModal');
+    createFloatingEmojis();
         }
 
         function copyBinanceIdFromModal() {
